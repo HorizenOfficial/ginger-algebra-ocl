@@ -8,6 +8,7 @@ use rust_gpu_tools::*;
 use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::cmp;
+use std::env;
 
 // use crate::utils::CACHED_PROGRAMS;
 use std::collections::HashMap;
@@ -15,6 +16,19 @@ use std::collections::HashMap;
 const LOG2_MAX_ELEMENTS: usize = 32; // At most 2^32 elements is supported.
 const MAX_LOG2_RADIX: u32 = 8; // Radix256
 const MAX_LOG2_LOCAL_WORK_SIZE: u32 = 7; // 128
+
+pub fn get_gpu_min_length() -> usize {
+
+    env::var("FFT_GPU_MIN_LENGTH")
+        .and_then(|v| match v.parse() {
+            Ok(val) => Ok(val),
+            Err(_) => {
+                error!("Invalid FFT_GPU_MIN_LENGTH! Defaulting to 128...");
+                Ok(128)
+            }
+        })
+        .unwrap_or(128)
+}
 
 static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
 

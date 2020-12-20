@@ -33,11 +33,11 @@ pub fn get_gpu_min_length() -> usize {
         .and_then(|v| match v.parse() {
             Ok(val) => Ok(val),
             Err(_) => {
-                error!("Invalid MSM_GPU_MIN_LENGTH! Defaulting to 0...");
-                Ok(0)
+                error!("Invalid MSM_GPU_MIN_LENGTH! Defaulting to 1024...");
+                Ok(1024)
             }
         })
-        .unwrap_or(0)
+        .unwrap_or(1024)
 }
 
 fn calc_num_groups(core_count: usize, num_windows: usize) -> usize {

@@ -8,8 +8,21 @@ use rust_gpu_tools::*;
 use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::collections::HashMap;
-
+use std::env;
 use std::cmp;
+
+pub fn get_gpu_min_length() -> usize {
+
+    env::var("POLYCOMMIT_GPU_MIN_LENGTH")
+        .and_then(|v| match v.parse() {
+            Ok(val) => Ok(val),
+            Err(_) => {
+                error!("Invalid POLYCOMMIT_GPU_MIN_LENGTH! Defaulting to 1024...");
+                Ok(1024)
+            }
+        })
+        .unwrap_or(1024)
+}
 
 static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
 
