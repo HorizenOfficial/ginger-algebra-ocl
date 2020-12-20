@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::cmp;
 
 lazy_mut! {
-    static mut CACHED_PROGRAMS = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
+    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
 }
 
 pub struct SinglePolycommitKernel<G>

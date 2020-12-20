@@ -16,7 +16,7 @@ const MAX_LOG2_RADIX: u32 = 8; // Radix256
 const MAX_LOG2_LOCAL_WORK_SIZE: u32 = 7; // 128
 
 lazy_mut! {
-    static mut CACHED_PROGRAMS = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
+    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
 }
 
 // Multiscalar kernel for a single GPU
