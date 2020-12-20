@@ -1,6 +1,6 @@
 use bellperson::gpu::{GPUError, GPUResult, kernel_polycommit};
 use algebra::{
-    AffineCurve, PrimeField, ProjectiveCurve
+    AffineCurve, PrimeField
 };
 use log::{error};
 use rust_gpu_tools::*;
@@ -9,8 +9,6 @@ use std::any::TypeId;
 use std::collections::HashMap;
 
 use std::cmp;
-
-const MAX_LOCAL_WORK_SIZE: usize = 128;
 
 pub struct SinglePolycommitKernel<G>
 where
