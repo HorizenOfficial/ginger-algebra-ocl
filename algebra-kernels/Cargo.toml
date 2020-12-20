@@ -5,7 +5,7 @@ authors = ["Phoinic <max@phoinic.com.ua>"]
 edition = "2018"
 
 [dependencies]
-algebra = { path = "../../ginger-lib/algebra" }
+algebra = { git = "ssh://git@github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
 algebra-cl-gen = { path = "../algebra-cl-gen" }
 rust-gpu-tools = { version = "0.2.0" }
 lazy_static = "1.4.0"

@@ -2,8 +2,8 @@
 
 members = [
     "algebra-cl-gen",
-    "ff-cl-gen",
-    "kernels"
+    "algebra-kernels",
+    "ff-cl-gen"
 ]
 
 [profile.release]

@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/filecoin-project/ff-cl-gen"
 
 [dependencies]
-algebra = { path = "../../ginger-lib/algebra" }
+algebra = { git = "ssh://git@github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
 itertools = { version = "0.8.0" }
 
 [dev-dependencies]
@@ -18,4 +18,4 @@ ocl = { version = "0.19.4", package = "fil-ocl"}
 rand = "0.7"
 lazy_static = "1.2"
 
-algebra = { path = "../../ginger-lib/algebra", features = [ "bls12_381" ] }
+algebra = { git = "ssh://git@github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl", features = [ "bls12_381" ] }
