@@ -5,18 +5,26 @@ use algebra::{
 use log::{error};
 use rust_gpu_tools::*;
 
+use std::any::TypeId;
 use std::cmp;
+
+// use crate::utils::CACHED_PROGRAMS;
+use std::collections::HashMap;
 
 const LOG2_MAX_ELEMENTS: usize = 32; // At most 2^32 elements is supported.
 const MAX_LOG2_RADIX: u32 = 8; // Radix256
 const MAX_LOG2_LOCAL_WORK_SIZE: u32 = 7; // 128
+
+lazy_mut! {
+    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::new();
+}
 
 // Multiscalar kernel for a single GPU
 pub struct SingleFftKernel<F>
 where
     F: PrimeField
 {
-    pub program: opencl::Program,
+    pub program: &'static opencl::Program,
    _phantom: std::marker::PhantomData<<F as PrimeField>::BigInt>,
 }
 
@@ -26,9 +34,21 @@ where
 {
     pub fn create(d: opencl::Device) -> GPUResult<SingleFftKernel<F>> {
 
-        let src = kernel_fft::<F>(true);
+        let hash_key = TypeId::of::<F>();
+        let program;
 
-        let program = opencl::Program::from_opencl(d, &src)?;
+        unsafe {
+            if !CACHED_PROGRAMS.contains_key(&d) {
+                CACHED_PROGRAMS.insert(d.clone(), HashMap::new());
+            }
+            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
+                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
+                    hash_key.clone(), 
+                    opencl::Program::from_opencl(d.clone(), &kernel_fft::<F>(true))?
+                );
+            }
+            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
+        }
 
         Ok(SingleFftKernel {
             program,

@@ -1,4 +1,4 @@
-use algebra_cl_gen::gpu::{GPUError, GPUResult, kernel_polycommit};
+use algebra_cl_gen::gpu::{GPUError, GPUResult, kernel_polycommit, get_prefix_map};
 use algebra::{
     AffineCurve, PrimeField
 };
@@ -10,11 +10,15 @@ use std::collections::HashMap;
 
 use std::cmp;
 
+lazy_mut! {
+    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::new();
+}
+
 pub struct SinglePolycommitKernel<G>
 where
     G: AffineCurve
 {
-    pub program: opencl::Program,
+    pub program: &'static opencl::Program,
     pub prefix_map: HashMap<TypeId, String>,
 
     _phantom: std::marker::PhantomData<<G::ScalarField as PrimeField>::BigInt>,
@@ -26,9 +30,22 @@ where
 {
     pub fn create(d: opencl::Device) -> GPUResult<SinglePolycommitKernel<G>> {
 
-        let (src, prefix_map) = kernel_polycommit::<G>(true);
+        let prefix_map = get_prefix_map::<G>();
+        let hash_key = TypeId::of::<G>();
+        let program;
 
-        let program = opencl::Program::from_opencl(d, &src)?;
+        unsafe {
+            if !CACHED_PROGRAMS.contains_key(&d) {
+                CACHED_PROGRAMS.insert(d.clone(), HashMap::new());
+            }
+            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
+                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
+                    hash_key.clone(), 
+                    opencl::Program::from_opencl(d.clone(), &kernel_polycommit::<G>(true))?
+                );
+            }
+            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
+        }
 
         Ok(SinglePolycommitKernel {
             program,

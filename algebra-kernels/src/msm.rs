@@ -1,7 +1,5 @@
-use algebra_cl_gen::gpu::{GPUError, GPUResult, get_core_count, kernel_multiexp};
-use algebra::{
-    AffineCurve, PrimeField, ProjectiveCurve
-};
+use algebra_cl_gen::gpu::{GPUError, GPUResult, get_core_count, get_prefix_map, kernel_multiexp};
+use algebra::{AffineCurve, PrimeField, ProjectiveCurve};
 use log::{error, info};
 use rust_gpu_tools::*;
 
@@ -88,12 +86,16 @@ where
         / (aff_size + scalar_size)
 }
 
+lazy_mut! {
+    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::new();
+}
+
 // Multiscalar kernel for a single GPU
 pub struct SingleMSMKernel<G>
 where
     G: AffineCurve
 {
-    pub program: opencl::Program,
+    pub program: &'static opencl::Program,
 
     pub core_count: usize,
     pub n: usize,
@@ -108,7 +110,22 @@ where
 {
     pub fn create(d: opencl::Device) -> GPUResult<SingleMSMKernel<G>> {
 
-        let (src, prefix_map) = kernel_multiexp::<G>(true);
+        let prefix_map = get_prefix_map::<G>();
+        let hash_key = TypeId::of::<G>();
+        let program;
+
+        unsafe {
+            if !CACHED_PROGRAMS.contains_key(&d) {
+                CACHED_PROGRAMS.insert(d.clone(), HashMap::new());
+            }
+            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
+                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
+                    hash_key.clone(), 
+                    opencl::Program::from_opencl(d.clone(), &kernel_multiexp::<G>(true))?
+                );
+            }
+            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
+        }
 
         let scalar_bits = std::mem::size_of::<<G::ScalarField as PrimeField>::BigInt>() * 8;
         let core_count = get_core_count(&d);
@@ -118,7 +135,7 @@ where
         let n = std::cmp::min(max_n, best_n);
 
         Ok(SingleMSMKernel {
-            program: opencl::Program::from_opencl(d, &src)?,
+            program,
             core_count,
             n,
             prefix_map,
