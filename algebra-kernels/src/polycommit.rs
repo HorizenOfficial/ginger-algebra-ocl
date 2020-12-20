@@ -63,11 +63,6 @@ where
             k_l.len(),
         );
 
-        let local_work_size = cmp::min(
-            global_work_size, 
-            MAX_LOCAL_WORK_SIZE
-        );
-
         let mut kernel_name = self.prefix_map[&TypeId::of::<G>()].clone();
         kernel_name.push_str("polycommit_round_reduce");
 
@@ -83,13 +78,13 @@ where
         rch_buf.write_from(0, &[
             round_challenge,
             round_challenge_inv,
-        ]);
+        ])?;
 
         let mut rch_repr_buf = self.program.create_buffer::<F::BigInt>(2)?;
         rch_repr_buf.write_from(0, &[
             round_challenge.into_repr(),
             round_challenge_inv.into_repr(),
-        ]);
+        ])?;
 
         let mut c_l_buf = self.program.create_buffer::<F>(c_l.len())?;
         c_l_buf.write_from(0, c_l)?;
