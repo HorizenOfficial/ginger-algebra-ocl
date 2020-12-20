@@ -80,47 +80,51 @@ where
     /// * `omega` - Special value `omega` is used for FFT over finite-fields
     /// * `log_n` - Specifies log2 of number of elements
     pub fn radix_fft(&self, a: &mut [F], omega: &F, log_n: u32) -> GPUResult<()> {
-        let n = 1 << log_n;
-        let mut src_buffer = self.program.create_buffer::<F>(n)?;
-        let mut dst_buffer = self.program.create_buffer::<F>(n)?;
 
-        let max_deg = cmp::min(MAX_LOG2_RADIX, log_n);
+        if log_n > 0 {
 
-        let mut pq_buffer = self.program.create_buffer::<F>(1 << MAX_LOG2_RADIX >> 1)?;
-        let mut omegas_buffer = self.program.create_buffer::<F>(LOG2_MAX_ELEMENTS)?;
-
-        // Precalculate:
-        // [omega^(0/(2^(deg-1))), omega^(1/(2^(deg-1))), ..., omega^((2^(deg-1)-1)/(2^(deg-1)))]
-        let mut pq = vec![F::zero(); 1 << max_deg >> 1];
-        let twiddle = omega.pow([(n >> max_deg) as u64]);
-        pq[0] = F::one();
-        if max_deg > 1 {
-            pq[1] = twiddle;
-            for i in 2..(1 << max_deg >> 1) {
-                pq[i] = pq[i - 1];
-                pq[i].mul_assign(&twiddle);
+            let n = 1 << log_n;
+            let mut src_buffer = self.program.create_buffer::<F>(n)?;
+            let mut dst_buffer = self.program.create_buffer::<F>(n)?;
+    
+            let max_deg = cmp::min(MAX_LOG2_RADIX, log_n);
+    
+            let mut pq_buffer = self.program.create_buffer::<F>(1 << MAX_LOG2_RADIX >> 1)?;
+            let mut omegas_buffer = self.program.create_buffer::<F>(LOG2_MAX_ELEMENTS)?;
+    
+            // Precalculate:
+            // [omega^(0/(2^(deg-1))), omega^(1/(2^(deg-1))), ..., omega^((2^(deg-1)-1)/(2^(deg-1)))]
+            let mut pq = vec![F::zero(); 1 << max_deg >> 1];
+            let twiddle = omega.pow([(n >> max_deg) as u64]);
+            pq[0] = F::one();
+            if max_deg > 1 {
+                pq[1] = twiddle;
+                for i in 2..(1 << max_deg >> 1) {
+                    pq[i] = pq[i - 1];
+                    pq[i].mul_assign(&twiddle);
+                }
             }
-        }
-        pq_buffer.write_from(0, &pq)?;
-
-        // Precalculate [omega, omega^2, omega^4, omega^8, ..., omega^(2^31)]
-        let mut omegas = vec![F::zero(); 32];
-        omegas[0] = *omega;
-        for i in 1..LOG2_MAX_ELEMENTS {
-            omegas[i] = omegas[i - 1].pow([2u64]);
-        }
-        omegas_buffer.write_from(0, &omegas)?;
-
-        src_buffer.write_from(0, &*a)?;
-        let mut log_p = 0u32;
-        while log_p < log_n {
-            let deg = cmp::min(max_deg, log_n - log_p);
-            self.radix_fft_round(&src_buffer, &dst_buffer, &pq_buffer, &omegas_buffer, log_n, log_p, deg, max_deg)?;
-            log_p += deg;
-            std::mem::swap(&mut src_buffer, &mut dst_buffer);
-        }
-
-        src_buffer.read_into(0, a)?;
+            pq_buffer.write_from(0, &pq)?;
+    
+            // Precalculate [omega, omega^2, omega^4, omega^8, ..., omega^(2^31)]
+            let mut omegas = vec![F::zero(); 32];
+            omegas[0] = *omega;
+            for i in 1..LOG2_MAX_ELEMENTS {
+                omegas[i] = omegas[i - 1].pow([2u64]);
+            }
+            omegas_buffer.write_from(0, &omegas)?;
+    
+            src_buffer.write_from(0, &*a)?;
+            let mut log_p = 0u32;
+            while log_p < log_n {
+                let deg = cmp::min(max_deg, log_n - log_p);
+                self.radix_fft_round(&src_buffer, &dst_buffer, &pq_buffer, &omegas_buffer, log_n, log_p, deg, max_deg)?;
+                log_p += deg;
+                std::mem::swap(&mut src_buffer, &mut dst_buffer);
+            }
+    
+            src_buffer.read_into(0, a)?;
+        }        
 
         Ok(())
     }
