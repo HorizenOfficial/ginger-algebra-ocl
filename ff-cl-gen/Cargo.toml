@@ -10,12 +10,14 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/filecoin-project/ff-cl-gen"
 
 [dependencies]
-ff = { version = "0.2.0", package = "fff" }
+algebra = { path = "../../ginger-lib/algebra" }
 itertools = { version = "0.8.0" }
-num-bigint = "0.2"
 
 [dev-dependencies]
 ocl = { version = "0.19.4", package = "fil-ocl"}
-paired = { version = "0.18.0" }
 rand = "0.7"
 lazy_static = "1.2"
+
+[features]
+bls12_381 = [ "algebra/bls12_381" ]
+jubjub = [ "algebra/jubjub" ]

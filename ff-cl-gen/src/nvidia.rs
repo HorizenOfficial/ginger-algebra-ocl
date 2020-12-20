@@ -1,11 +1,11 @@
 use crate::Limb;
-use ff::PrimeField;
+use algebra::Field;
 use itertools::*;
 
 /// Generates PTX-Assembly implementation of FIELD_add_/FIELD_sub_
 pub fn field_add_sub_nvidia<F, L: Limb>() -> String
 where
-    F: PrimeField,
+    F: Field,
 {
     let mut result = String::new();
     let (ptx_type, ptx_reg) = L::ptx_info();
