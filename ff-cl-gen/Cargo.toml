@@ -18,6 +18,4 @@ ocl = { version = "0.19.4", package = "fil-ocl"}
 rand = "0.7"
 lazy_static = "1.2"
 
-[features]
-bls12_381 = [ "algebra/bls12_381" ]
-jubjub = [ "algebra/jubjub" ]
+algebra = { path = "../../ginger-lib/algebra", features = [ "bls12_381" ] }
