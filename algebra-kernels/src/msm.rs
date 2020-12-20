@@ -3,9 +3,10 @@ use algebra::{AffineCurve, PrimeField, ProjectiveCurve};
 use log::{error, info};
 use rust_gpu_tools::*;
 
-use std::env;
+use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::collections::HashMap;
+use std::env;
 
 const MEMORY_PADDING: f64 = 0.2f64; // Let 20% of GPU memory be free
 const MAX_WINDOW_SIZE: usize = 10;
@@ -86,9 +87,7 @@ where
         / (aff_size + scalar_size)
 }
 
-lazy_mut! {
-    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
-}
+static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
 
 // Multiscalar kernel for a single GPU
 pub struct SingleMSMKernel<G>

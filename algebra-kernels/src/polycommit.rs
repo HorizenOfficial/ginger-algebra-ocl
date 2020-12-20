@@ -5,14 +5,13 @@ use algebra::{
 use log::{error};
 use rust_gpu_tools::*;
 
+use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::collections::HashMap;
 
 use std::cmp;
 
-lazy_mut! {
-    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
-}
+static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
 
 pub struct SinglePolycommitKernel<G>
 where

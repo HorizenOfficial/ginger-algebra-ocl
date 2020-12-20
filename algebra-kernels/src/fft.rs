@@ -5,6 +5,7 @@ use algebra::{
 use log::{error};
 use rust_gpu_tools::*;
 
+use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::cmp;
 
@@ -15,9 +16,7 @@ const LOG2_MAX_ELEMENTS: usize = 32; // At most 2^32 elements is supported.
 const MAX_LOG2_RADIX: u32 = 8; // Radix256
 const MAX_LOG2_LOCAL_WORK_SIZE: u32 = 7; // 128
 
-lazy_mut! {
-    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
-}
+static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
 
 // Multiscalar kernel for a single GPU
 pub struct SingleFftKernel<F>
