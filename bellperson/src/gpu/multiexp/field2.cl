@@ -28,34 +28,28 @@ FIELD2 FIELD2_double(FIELD2 a) {
   return a;
 }
 
-/*
- * (a_0 + u * a_1)(b_0 + u * b_1) = a_0 * b_0 - a_1 * b_1 + u * (a_0 * b_1 + a_1 * b_0)
- * Therefore:
- * c_0 = a_0 * b_0 - a_1 * b_1
- * c_1 = (a_0 * b_1 + a_1 * b_0) = (a_0 + a_1) * (b_0 + b_1) - a_0 * b_0 - a_1 * b_1
- */
 FIELD2 FIELD2_mul(FIELD2 a, FIELD2 b) {
-  const FIELD aa = FIELD_mul(a.c0, b.c0);
-  const FIELD bb = FIELD_mul(a.c1, b.c1);
+  const FIELD v0 = FIELD_mul(a.c0, b.c0);
+  const FIELD v1 = FIELD_mul(a.c1, b.c1);
   const FIELD o = FIELD_add(b.c0, b.c1);
+  const FIELD o2 = FIELD_mul(FIELD_NONRESIDUE, v1);
   a.c1 = FIELD_add(a.c1, a.c0);
   a.c1 = FIELD_mul(a.c1, o);
-  a.c1 = FIELD_sub(a.c1, aa);
-  a.c1 = FIELD_sub(a.c1, bb);
-  a.c0 = FIELD_sub(aa, bb);
+  a.c1 = FIELD_sub(a.c1, v0);
+  a.c1 = FIELD_sub(a.c1, v1);
+  a.c0 = FIELD_add(v0, o2);
   return a;
 }
 
-/*
- * (a_0 + u * a_1)(a_0 + u * a_1) = a_0 ^ 2 - a_1 ^ 2 + u * 2 * a_0 * a_1
- * Therefore:
- * c_0 = (a_0 * a_0 - a_1 * a_1) = (a_0 + a_1)(a_0 - a_1)
- * c_1 = 2 * a_0 * a_1
- */
 FIELD2 FIELD2_sqr(FIELD2 a) {
-  const FIELD ab = FIELD_mul(a.c0, a.c1);
-  const FIELD c0c1 = FIELD_add(a.c0, a.c1);
-  a.c0 = FIELD_mul(FIELD_sub(a.c0, a.c1), c0c1);
-  a.c1 = FIELD_double(ab);
+  FIELD v0 = FIELD_sub(a.c0, a.c1);
+  const FIELD o1 = FIELD_mul(FIELD_NONRESIDUE, a.c1);
+  const FIELD v3 = FIELD_sub(a.c0, o1);
+  const FIELD v2 = FIELD_mul(a.c0, a.c1);
+  const FIELD o2 = FIELD_mul(FIELD_NONRESIDUE, v2);
+  v0 = FIELD_mul(v0, v3);
+  v0 = FIELD_add(v0, v2);
+  a.c1 = FIELD_double(v2);
+  a.c0 = FIELD_add(v0, o2);
   return a;
 }
