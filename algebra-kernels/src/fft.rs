@@ -17,12 +17,7 @@ where
     F: PrimeField
 {
     pub program: opencl::Program,
-
-    // pq_buffer: opencl::Buffer<F>,
-    // omegas_buffer: opencl::Buffer<F>,
-    // pub prefix_map: HashMap<TypeId, String>,
-
-    _phantom: std::marker::PhantomData<<F as PrimeField>::BigInt>,
+   _phantom: std::marker::PhantomData<<F as PrimeField>::BigInt>,
 }
 
 impl<F> SingleFftKernel<F>
@@ -37,9 +32,6 @@ where
 
         Ok(SingleFftKernel {
             program,
-            // pq_buffer,
-            // omegas_buffer,
-            // prefix_map,
             _phantom: std::marker::PhantomData,
         })
     }
@@ -162,49 +154,3 @@ where
 
     Ok(kernels)
 }
-
-// pub struct FftWorker<F>
-// where
-//     F: PrimeField
-// {
-//     kernels: Vec<SingleFftKernel<F>>
-// }
-
-// impl<F> FftWorker<F>
-// where
-//     F: PrimeField
-// {
-//     pub fn create() -> GPUResult<FftWorker<F>> {
-
-//         let mut devices = opencl::Device::all()?;
-//         devices.truncate(1);
-
-//         let kernels: Vec<_> = devices
-//             .into_iter()
-//             .map(|d| (d.clone(), SingleFftKernel::<F>::create(d)))
-//             .filter_map(|(device, res)| {
-//                 if let Err(ref e) = res {
-//                     error!(
-//                         "Cannot initialize kernel for device '{}'! Error: {}",
-//                         device.name(),
-//                         e
-//                     );
-//                 }
-//                 res.ok()
-//             })
-//             .collect();
-
-//         if kernels.is_empty() {
-//             return Err(GPUError::Simple("No working GPUs found!"));
-//         }
-
-//         Ok(FftWorker {
-//             kernels
-//         })
-//     }
-
-//     pub fn get_kernels(&self) -> &[SingleFftKernel<F>]
-//     {
-//         self.kernels.as_slice()
-//     }
-// }
