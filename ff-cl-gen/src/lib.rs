@@ -71,7 +71,7 @@ impl Limb for Limb64 {
     }
 }
 
-fn define_field<L: Limb>(name: &str, limbs: Vec<L>) -> String {
+pub fn define_field<L: Limb>(name: &str, limbs: Vec<L>) -> String {
     format!(
         "#define {} ((FIELD){{ {{ {} }} }})",
         name,
