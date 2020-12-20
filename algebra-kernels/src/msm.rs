@@ -87,7 +87,7 @@ where
 }
 
 lazy_mut! {
-    static mut CACHED_PROGRAMS: HashMap<opencl::Device, HashMap<TypeId, opencl::Program>> = HashMap::new();
+    static mut CACHED_PROGRAMS = HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new();
 }
 
 // Multiscalar kernel for a single GPU
@@ -116,7 +116,7 @@ where
 
         unsafe {
             if !CACHED_PROGRAMS.contains_key(&d) {
-                CACHED_PROGRAMS.insert(d.clone(), HashMap::new());
+                CACHED_PROGRAMS.insert(d.clone(), HashMap::<HashMap<TypeId, opencl::Program>>::new());
             }
             if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
                 CACHED_PROGRAMS.get_mut(&d).unwrap().insert(

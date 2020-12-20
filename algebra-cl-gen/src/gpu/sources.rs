@@ -73,7 +73,6 @@ pub fn get_prefix_map<G>() -> HashMap<TypeId, String>
 where
     G: AffineCurve
 {
-
     let mut prefix_map = HashMap::<TypeId, String>::new();
 
     #[cfg(feature = "bn_382")]
