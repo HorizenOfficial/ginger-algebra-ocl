@@ -1,4 +1,4 @@
-use bellperson::gpu::{GPUError, GPUResult, kernel_fft};
+use algebra_cl_gen::gpu::{GPUError, GPUResult, kernel_fft};
 use algebra::{
     PrimeField
 };

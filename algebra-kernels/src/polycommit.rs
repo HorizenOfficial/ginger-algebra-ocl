@@ -1,4 +1,4 @@
-use bellperson::gpu::{GPUError, GPUResult, kernel_polycommit};
+use algebra_cl_gen::gpu::{GPUError, GPUResult, kernel_polycommit};
 use algebra::{
     AffineCurve, PrimeField
 };

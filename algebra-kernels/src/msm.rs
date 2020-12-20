@@ -1,4 +1,4 @@
-use bellperson::gpu::{GPUError, GPUResult, get_core_count, kernel_multiexp};
+use algebra_cl_gen::gpu::{GPUError, GPUResult, get_core_count, kernel_multiexp};
 use algebra::{
     AffineCurve, PrimeField, ProjectiveCurve
 };

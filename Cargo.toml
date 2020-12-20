@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "bellperson",
+    "algebra-cl-gen",
     "ff-cl-gen",
     "kernels"
 ]
