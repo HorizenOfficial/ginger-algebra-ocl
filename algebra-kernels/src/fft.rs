@@ -37,7 +37,7 @@ where
         let program;
 
         unsafe {
-	    CACHED_PROGRAMS.init();
+	        CACHED_PROGRAMS.init();
             if !CACHED_PROGRAMS.contains_key(&d) {
                 CACHED_PROGRAMS.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
             }
