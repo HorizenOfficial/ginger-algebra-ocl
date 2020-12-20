@@ -132,3 +132,14 @@ POINT_projective POINT_add(POINT_projective a, POINT_projective b) {
     return a;
   }
 }
+
+POINT_projective POINT_affine_mul(POINT_affine p, EXPONENT n) {
+  POINT_projective res = POINT_ZERO;
+  for (uint i = 0; i < EXPONENT_BITS; i++) {
+    res = POINT_double(res);
+    if (EXPONENT_get_bit(n, i)) {
+      res = POINT_add_mixed(res, p);
+    }
+  }
+  return res;
+}
