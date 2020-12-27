@@ -159,7 +159,7 @@ pub fn get_kernels<G>() -> GPUResult<Vec<SinglePolycommitKernel<G>>>
 where
     G: AffineCurve
 {
-    let mut devices = opencl::Device::all()?;
+    let mut devices = opencl::Device::all();
     devices.truncate(1);
 
     let kernels: Vec<_> = devices

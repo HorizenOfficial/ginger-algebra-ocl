@@ -306,7 +306,7 @@ pub fn get_kernels<G>() -> GPUResult<Vec<SingleMSMKernel<G>>>
 where
     G: AffineCurve
 {
-    let devices = opencl::Device::all()?;
+    let devices = opencl::Device::all();
 
     let kernels: Vec<_> = devices
         .into_iter()

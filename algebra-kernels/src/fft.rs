@@ -165,7 +165,7 @@ pub fn get_kernels<F>() -> GPUResult<Vec<SingleFftKernel<F>>>
 where
     F: PrimeField
 {
-    let mut devices = opencl::Device::all()?;
+    let mut devices = opencl::Device::all();
     devices.truncate(1);
 
     let kernels: Vec<_> = devices
