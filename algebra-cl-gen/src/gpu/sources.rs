@@ -146,9 +146,9 @@ where
     {
         src = vec![
             if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fp, Limb64>("Fp")
+                ffgen::field::<algebra::fields::bn_382::Fr, Limb64>("Fp")
             } else {
-                ffgen::field::<algebra::fields::bn_382::Fp, Limb32>("Fp")
+                ffgen::field::<algebra::fields::bn_382::Fr, Limb32>("Fp")
             },
             if limb64 {
                 ffgen::field::<algebra::fields::bn_382::Fq, Limb64>("Fq")
@@ -264,9 +264,9 @@ where
     {
         src = vec![
             if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fp, Limb64>("Fp")
+                ffgen::field::<algebra::fields::tweedle::Fr, Limb64>("Fp")
             } else {
-                ffgen::field::<algebra::fields::tweedle::Fp, Limb32>("Fp")
+                ffgen::field::<algebra::fields::tweedle::Fr, Limb32>("Fp")
             },
             if limb64 {
                 ffgen::field::<algebra::fields::tweedle::Fq, Limb64>("Fq")
@@ -297,9 +297,9 @@ where
     {
         src = vec![
             if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fp, Limb64>("Fp")
+                ffgen::field::<algebra::fields::bn_382::Fr, Limb64>("Fp")
             } else {
-                ffgen::field::<algebra::fields::bn_382::Fp, Limb32>("Fp")
+                ffgen::field::<algebra::fields::bn_382::Fr, Limb32>("Fp")
             },
             if limb64 {
                 ffgen::field::<algebra::fields::bn_382::Fq, Limb64>("Fq")
@@ -415,9 +415,9 @@ where
     {
         src = vec![
             if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fp, Limb64>("Fp")
+                ffgen::field::<algebra::fields::tweedle::Fr, Limb64>("Fp")
             } else {
-                ffgen::field::<algebra::fields::tweedle::Fp, Limb32>("Fp")
+                ffgen::field::<algebra::fields::tweedle::Fr, Limb32>("Fp")
             },
             if limb64 {
                 ffgen::field::<algebra::fields::tweedle::Fq, Limb64>("Fq")
