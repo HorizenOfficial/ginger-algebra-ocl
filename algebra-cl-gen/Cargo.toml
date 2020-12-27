@@ -16,7 +16,7 @@ log = "0.4.8"
 lazy_static = "1.4.0"
 thiserror = "1.0.10"
 itertools = { version = "0.8.0" }
-rust-gpu-tools = { version = "0.2.0" }
+rust-gpu-tools = { git="https://github.com/phoinic/rust-gpu-tools" }
 ff-cl-gen = { path = "../ff-cl-gen" }
 
 [dev-dependencies]
