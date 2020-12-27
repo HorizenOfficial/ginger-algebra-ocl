@@ -170,7 +170,7 @@ where
 
     let kernels: Vec<_> = devices
         .into_iter()
-        .map(|d| (d.clone(), SingleFftKernel::<F>::create(d)))
+        .map(|d| (d.clone(), SingleFftKernel::<F>::create(d.clone())))
         .filter_map(|(device, res)| {
             if let Err(ref e) = res {
                 error!(
