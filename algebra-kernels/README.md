@@ -20,9 +20,9 @@ Notes:
 
  ```toml
  [dependencies]
- ...
+
  algebra-kernels = { git = "https://github.com/HorizenOfficial/ginger-algebra-ocl", branch = "ginger_ocl", features = ["bn_382"] }
- ...
+
  ```
 
 ## Multi scalar multiplication kernel
