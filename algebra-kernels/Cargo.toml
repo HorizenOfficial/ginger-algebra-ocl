@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 algebra = { git = "ssh://git@github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
 algebra-cl-gen = { path = "../algebra-cl-gen" }
-rust-gpu-tools = { git="https://github.com/phoinic/rust-gpu-tools" }
+rust-gpu-tools = { version = "0.3.0" }
 lazy_static = "1.4.0"
 lazy_mut = "0.1.0"
 log = "0.4.8"
