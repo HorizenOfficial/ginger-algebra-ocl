@@ -94,8 +94,6 @@ where
         let mut kernel_name = self.prefix_map[&TypeId::of::<G>()].clone();
         kernel_name.push_str("polycommit_round_reduce");
 
-        println!("Preparing kernel: {}", kernel_name);
-
         let kernel = self.program.create_kernel(
             kernel_name.as_str(),
             global_work_size,
