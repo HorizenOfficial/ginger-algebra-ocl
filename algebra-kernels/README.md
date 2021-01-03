@@ -14,16 +14,16 @@ Notes:
  - Currently supported curves are: `bn_382`, `bls12_381`, `bls12_377`, `bn254`, `tweedle`
  - All examples in this README will use `bn_382` curve
 
- ## Library connection
+## Library connection
 
- Add the following to the `dependencies` section of your `Cargo.toml`:
+Add the following to the `dependencies` section of your `Cargo.toml`:
 
- ```toml
- [dependencies]
-
- algebra-kernels = { git = "https://github.com/HorizenOfficial/ginger-algebra-ocl", branch = "ginger_ocl", features = ["bn_382"] }
-
- ```
+```toml
+[dependencies]
+# ... 
+algebra-kernels = { git = "https://github.com/HorizenOfficial/ginger-algebra-ocl", branch = "ginger_ocl", features = ["bn_382"] }
+# ...
+```
 
 ## Multi scalar multiplication kernel
 
