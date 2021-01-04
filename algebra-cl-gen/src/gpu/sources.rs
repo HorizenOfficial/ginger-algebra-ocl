@@ -50,17 +50,11 @@ fn polycommit_round_reduce(point: &str, exp: &str) -> String {
 }
 
 
-#[cfg(not(feature = "blstrs"))]
-const BLSTRS_DEF: &str = "";
-#[cfg(feature = "blstrs")]
-const BLSTRS_DEF: &str = "#define BLSTRS";
-
 fn ec(field: &str, point: &str, exp: &str) -> String {
     String::from(EC_SRC)
         .replace("FIELD", field)
         .replace("POINT", point)
-        .replace("EXPONENT", exp)
-        .replace("__BLSTRS__", BLSTRS_DEF)
+        .replace("EXPONENT", exp)        
 }
 
 fn multiexp(point: &str, exp: &str) -> String {
