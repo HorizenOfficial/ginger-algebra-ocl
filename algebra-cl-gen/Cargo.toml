@@ -11,7 +11,7 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
-algebra = { git = "ssh://git@github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
+algebra = { git = "https://github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
 log = "0.4.8"
 lazy_static = "1.4.0"
 thiserror = "1.0.10"
