@@ -118,11 +118,11 @@ pub fn kernel_fft<F: PrimeField>(limb64: bool) -> String
 {
     vec![
         if limb64 {
-            field::<F, Limb64>("Fp")
+            field::<F, Limb64>("Fr")
         } else {
-            field::<F, Limb32>("Fp")
+            field::<F, Limb32>("Fr")
         },
-        fft("Fp"),
+        fft("Fr"),
     ]
     .join("\n\n")
 }
@@ -138,141 +138,56 @@ where
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fr, Limb64>("Fp")
-            } else {
-                ffgen::field::<algebra::fields::bn_382::Fr, Limb32>("Fp")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bn_382::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bn_382::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bn_382::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },            
-            field2("Fq2", "Fq"),
-            ec("Fp", "G", "Fp"),
-            multiexp("G", "Fp"),
-            ec("Fq", "G1", "Fp"),
-            multiexp("G1", "Fp"),
-            ec("Fq2", "G2", "Fp"),
-            multiexp("G2", "Fp"),
-        ]
-        .join("\n\n");
+        src = multiexp_src!(
+            limb64, bn_382, true,
+            "G", "Fr", "Fr",
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );
     }
 
     #[cfg(feature = "bls12_381")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_381::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bls12_381::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_381::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bls12_381::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bls12_381::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bls12_381::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            multiexp("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            multiexp("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = multiexp_src!(
+            limb64, bls12_381, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
     
     #[cfg(feature = "bls12_377")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_377::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bls12_377::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_377::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bls12_377::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bls12_377::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bls12_377::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            multiexp("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            multiexp("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = multiexp_src!(
+            limb64, bls12_377, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
     
     #[cfg(feature = "bn254")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bn254::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bn254::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bn254::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bn254::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bn254::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bn254::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            multiexp("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            multiexp("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = multiexp_src!(
+            limb64, bn254, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
-    
+
     #[cfg(feature = "tweedle")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dee::Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dum::Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fr, Limb64>("Fp")
-            } else {
-                ffgen::field::<algebra::fields::tweedle::Fr, Limb32>("Fp")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::tweedle::Fq, Limb32>("Fq")
-            },
-            ec("Fq", "Dee", "Fp"),
-            multiexp("Dee", "Fp"),
-            ec("Fp", "Dum", "Fp"),
-            multiexp("Dum", "Fp"),
-        ]
-        .join("\n\n");
+        src = multiexp_src!(
+            limb64, tweedle, false,
+            "Dee", "Fq", "Fr",
+            "Dum", "Fr", "Fq"
+        );        
     }
 
     src
@@ -289,141 +204,56 @@ where
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fr, Limb64>("Fp")
-            } else {
-                ffgen::field::<algebra::fields::bn_382::Fr, Limb32>("Fp")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bn_382::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bn_382::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bn_382::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bn_382::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },            
-            field2("Fq2", "Fq"),
-            ec("Fp", "G", "Fp"),
-            polycommit_round_reduce("G", "Fp"),
-            ec("Fq", "G1", "Fp"),
-            polycommit_round_reduce("G1", "Fp"),
-            ec("Fq2", "G2", "Fp"),
-            polycommit_round_reduce("G2", "Fp"),
-        ]
-        .join("\n\n");
+        src = polycommit_round_reduce_src!(
+            limb64, bn_382, true,
+            "G", "Fr", "Fr",
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );
     }
 
     #[cfg(feature = "bls12_381")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_381::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bls12_381::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_381::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bls12_381::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bls12_381::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bls12_381::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            polycommit_round_reduce("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            polycommit_round_reduce("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = polycommit_round_reduce_src!(
+            limb64, bls12_381, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
     
     #[cfg(feature = "bls12_377")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_377::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bls12_377::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bls12_377::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bls12_377::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bls12_377::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bls12_377::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            polycommit_round_reduce("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            polycommit_round_reduce("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = polycommit_round_reduce_src!(
+            limb64, bls12_377, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
     
     #[cfg(feature = "bn254")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G1Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G2Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::bn254::Fr, Limb64>("Fr")
-            } else {
-                ffgen::field::<algebra::fields::bn254::Fr, Limb32>("Fr")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::bn254::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::bn254::Fq, Limb32>("Fq")
-            },
-            if limb64 {
-                params2::<algebra::fields::bn254::Fq2Parameters, Limb64>("Fq2", "Fq")
-            } else {
-                params2::<algebra::fields::bn254::Fq2Parameters, Limb32>("Fq2", "Fq")
-            },
-            field2("Fq2", "Fq"),
-            ec("Fq", "G1", "Fr"),
-            polycommit_round_reduce("G1", "Fr"),
-            ec("Fq2", "G2", "Fr"),
-            polycommit_round_reduce("G2", "Fr"),
-        ]
-        .join("\n\n");
+        src = polycommit_round_reduce_src!(
+            limb64, bn254, true,
+            "G1", "Fq", "Fr",
+            "G2", "Fq2", "Fr"
+        );        
     }
 
     #[cfg(feature = "tweedle")]
     if TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dee::Affine>() ||
        TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dum::Affine>()
     {
-        src = vec![
-            if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fr, Limb64>("Fp")
-            } else {
-                ffgen::field::<algebra::fields::tweedle::Fr, Limb32>("Fp")
-            },
-            if limb64 {
-                ffgen::field::<algebra::fields::tweedle::Fq, Limb64>("Fq")
-            } else {
-                ffgen::field::<algebra::fields::tweedle::Fq, Limb32>("Fq")
-            },
-            ec("Fq", "Dee", "Fp"),
-            polycommit_round_reduce("Dee", "Fp"),
-            ec("Fp", "Dum", "Fp"),
-            polycommit_round_reduce("Dum", "Fp"),
-        ]
-        .join("\n\n");
+        src = polycommit_round_reduce_src!(
+            limb64, tweedle, false,
+            "Dee", "Fq", "Fr",
+            "Dum", "Fr", "Fq"
+        );        
     }
 
     src
