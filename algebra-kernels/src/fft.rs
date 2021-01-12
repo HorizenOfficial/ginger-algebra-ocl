@@ -5,13 +5,11 @@ use algebra::{
 use log::{error};
 use rust_gpu_tools::*;
 
-use lazy_mut::LazyMut;
-use std::any::TypeId;
 use std::cmp;
 use std::env;
+use std::any::TypeId;
 
-// use crate::utils::CACHED_PROGRAMS;
-use std::collections::HashMap;
+use crate::SingleKernel;
 
 const LOG2_MAX_ELEMENTS: usize = 32; // At most 2^32 elements is supported.
 const MAX_LOG2_RADIX: u32 = 8; // Radix256
@@ -30,41 +28,32 @@ pub fn get_gpu_min_length() -> usize {
         .unwrap_or(128)
 }
 
-static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
-
 // Multiscalar kernel for a single GPU
-pub struct SingleFftKernel<F>
+pub struct FFTSingleKernel<'a, F>
 where
     F: PrimeField
 {
-    pub program: &'static opencl::Program,
+    pub program: &'a opencl::Program,
    _phantom: std::marker::PhantomData<<F as PrimeField>::BigInt>,
 }
 
-impl<F> SingleFftKernel<F>
+impl<'a, F: PrimeField> SingleKernel<'a> for FFTSingleKernel<'a, F> {
+
+    fn get_program_src() -> String {        
+        kernel_fft::<F>(true)
+    }
+}
+
+impl<'a, F> FFTSingleKernel<'a, F>
 where
     F: PrimeField
 {
-    pub fn create(d: opencl::Device) -> GPUResult<SingleFftKernel<F>> {
+    pub fn create(d: opencl::Device) -> GPUResult<FFTSingleKernel<'a, F>> {
 
-        let hash_key = TypeId::of::<F>();
-        let program;
+        let hash_key = TypeId::of::<FFTSingleKernel<F>>();
+        let program= Self::get_program(&d, hash_key).unwrap();
 
-        unsafe {
-	        CACHED_PROGRAMS.init();
-            if !CACHED_PROGRAMS.contains_key(&d) {
-                CACHED_PROGRAMS.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
-            }
-            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
-                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
-                    hash_key.clone(), 
-                    opencl::Program::from_opencl(d.clone(), &kernel_fft::<F>(true))?
-                );
-            }
-            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
-        }
-
-        Ok(SingleFftKernel {
+        Ok(FFTSingleKernel {
             program,
             _phantom: std::marker::PhantomData,
         })
@@ -161,7 +150,7 @@ where
     }
 }
 
-pub fn get_kernels<F>() -> GPUResult<Vec<SingleFftKernel<F>>>
+pub fn get_kernels<'a, F>() -> GPUResult<Vec<FFTSingleKernel<'a, F>>>
 where
     F: PrimeField
 {
@@ -170,7 +159,7 @@ where
 
     let kernels: Vec<_> = devices
         .into_iter()
-        .map(|d| (d.clone(), SingleFftKernel::<F>::create(d.clone())))
+        .map(|d| (d.clone(), FFTSingleKernel::<F>::create(d.clone())))
         .filter_map(|(device, res)| {
             if let Err(ref e) = res {
                 error!(

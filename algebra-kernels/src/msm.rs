@@ -3,10 +3,11 @@ use algebra::{AffineCurve, PrimeField, ProjectiveCurve};
 use log::{error, info};
 use rust_gpu_tools::*;
 
-use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::env;
+
+use crate::SingleKernel;
 
 const MEMORY_PADDING: f64 = 0.2f64; // Let 20% of GPU memory be free
 const MAX_WINDOW_SIZE: usize = 10;
@@ -87,14 +88,12 @@ where
         / (aff_size + scalar_size)
 }
 
-static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
-
 // Multiscalar kernel for a single GPU
-pub struct SingleMSMKernel<G>
+pub struct MSMSingleKernel<'a, G>
 where
     G: AffineCurve
 {
-    pub program: &'static opencl::Program,
+    pub program: &'a opencl::Program,
 
     pub core_count: usize,
     pub n: usize,
@@ -103,29 +102,22 @@ where
     _phantom: std::marker::PhantomData<<G::ScalarField as PrimeField>::BigInt>,
 }
 
-impl<G> SingleMSMKernel<G>
+impl<'a, G: AffineCurve> SingleKernel<'a> for MSMSingleKernel<'a, G> {
+
+    fn get_program_src() -> String {        
+        kernel_multiexp::<G>(true)
+    }
+}
+
+impl<'a, G> MSMSingleKernel<'a, G>
 where
     G: AffineCurve
 {
-    pub fn create(d: opencl::Device) -> GPUResult<SingleMSMKernel<G>> {
+    pub fn create(d: opencl::Device) -> GPUResult<MSMSingleKernel<'a, G>> {
 
+        let hash_key = TypeId::of::<MSMSingleKernel<G>>();
         let prefix_map = get_prefix_map::<G>();
-        let hash_key = TypeId::of::<G>();
-        let program;
-
-        unsafe {
-	        CACHED_PROGRAMS.init();
-            if !CACHED_PROGRAMS.contains_key(&d) {
-                CACHED_PROGRAMS.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
-            }
-            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
-                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
-                    hash_key.clone(), 
-                    opencl::Program::from_opencl(d.clone(), &kernel_multiexp::<G>(true))?
-                );
-            }
-            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
-        }
+        let program= Self::get_program(&d, hash_key).unwrap();
 
         let scalar_bits = std::mem::size_of::<<G::ScalarField as PrimeField>::BigInt>() * 8;
         let core_count = get_core_count(&d);
@@ -134,7 +126,7 @@ where
         let best_n = calc_best_chunk_size(MAX_WINDOW_SIZE, core_count, scalar_bits);
         let n = std::cmp::min(max_n, best_n);
 
-        Ok(SingleMSMKernel {
+        Ok(MSMSingleKernel {
             program,
             core_count,
             n,
@@ -302,7 +294,7 @@ where
     }
 }
 
-pub fn get_kernels<G>() -> GPUResult<Vec<SingleMSMKernel<G>>>
+pub fn get_kernels<'a, G>() -> GPUResult<Vec<MSMSingleKernel<'a, G>>>
 where
     G: AffineCurve
 {
@@ -310,7 +302,7 @@ where
 
     let kernels: Vec<_> = devices
         .into_iter()
-        .map(|d| (d.clone(), SingleMSMKernel::<G>::create(d.clone())))
+        .map(|d| (d.clone(), MSMSingleKernel::<G>::create(d.clone())))
         .filter_map(|(device, res)| {
             if let Err(ref e) = res {
                 error!(

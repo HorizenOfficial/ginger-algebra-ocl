@@ -5,11 +5,12 @@ use algebra::{
 use log::{error};
 use rust_gpu_tools::*;
 
-use lazy_mut::LazyMut;
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::env;
 use std::cmp;
+
+use crate::SingleKernel;
 
 pub fn get_gpu_min_length() -> usize {
 
@@ -24,43 +25,34 @@ pub fn get_gpu_min_length() -> usize {
         .unwrap_or(1024)
 }
 
-static mut CACHED_PROGRAMS: LazyMut<HashMap<opencl::Device, HashMap<TypeId, opencl::Program>>> = LazyMut::Init(HashMap::<opencl::Device, HashMap<TypeId, opencl::Program>>::new);
-
-pub struct SinglePolycommitKernel<G>
+pub struct PolycommitSingleKernel<'a, G>
 where
     G: AffineCurve
 {
-    pub program: &'static opencl::Program,
+    pub program: &'a opencl::Program,
     pub prefix_map: HashMap<TypeId, String>,
 
     _phantom: std::marker::PhantomData<<G::ScalarField as PrimeField>::BigInt>,
 }
 
-impl<G> SinglePolycommitKernel<G>
+impl<'a, G: AffineCurve> SingleKernel<'a> for PolycommitSingleKernel<'a, G> {
+
+    fn get_program_src() -> String {        
+        kernel_polycommit::<G>(true)
+    }
+}
+
+impl<'a, G> PolycommitSingleKernel<'a, G>
 where
     G: AffineCurve
 {
-    pub fn create(d: opencl::Device) -> GPUResult<SinglePolycommitKernel<G>> {
+    pub fn create(d: opencl::Device) -> GPUResult<PolycommitSingleKernel<'a, G>> {
 
         let prefix_map = get_prefix_map::<G>();
-        let hash_key = TypeId::of::<G>();
-        let program;
-
-        unsafe {
-	        CACHED_PROGRAMS.init();
-            if !CACHED_PROGRAMS.contains_key(&d) {
-                CACHED_PROGRAMS.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
-            }
-            if !CACHED_PROGRAMS.get(&d).unwrap().contains_key(&hash_key) {
-                CACHED_PROGRAMS.get_mut(&d).unwrap().insert(
-                    hash_key.clone(), 
-                    opencl::Program::from_opencl(d.clone(), &kernel_polycommit::<G>(true))?
-                );
-            }
-            program = CACHED_PROGRAMS.get(&d).unwrap().get(&hash_key).unwrap();    
-        }
-
-        Ok(SinglePolycommitKernel {
+        let hash_key = TypeId::of::<PolycommitSingleKernel<G>>();
+        let program=Self::get_program(&d, hash_key).unwrap();
+        
+        Ok(PolycommitSingleKernel {
             program,
             prefix_map,
             _phantom: std::marker::PhantomData,
@@ -153,7 +145,7 @@ where
     }
 }
 
-pub fn get_kernels<G>() -> GPUResult<Vec<SinglePolycommitKernel<G>>>
+pub fn get_kernels<'a, G>() -> GPUResult<Vec<PolycommitSingleKernel<'a, G>>>
 where
     G: AffineCurve
 {
@@ -162,7 +154,7 @@ where
 
     let kernels: Vec<_> = devices
         .into_iter()
-        .map(|d| (d.clone(), SinglePolycommitKernel::<G>::create(d.clone())))
+        .map(|d| (d.clone(), PolycommitSingleKernel::<G>::create(d.clone())))
         .filter_map(|(device, res)| {
             if let Err(ref e) = res {
                 error!(
