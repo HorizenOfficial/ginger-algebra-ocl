@@ -3,6 +3,9 @@ pub mod msm;
 pub mod fft;
 pub mod polycommit;
 
+#[cfg(test)]
+mod test;
+
 use algebra_cl_gen::gpu::GPUResult;
 use rust_gpu_tools::*;
 use lazy_mut::LazyMut;
@@ -17,12 +20,10 @@ trait SingleKernel<'a> {
 
     fn get_program(d: &opencl::Device, hash_key: TypeId) -> GPUResult<&'a opencl::Program> {
 
-        let programs;
-
-        unsafe {
+        let programs = unsafe {
             CACHED_PROGRAMS.init();
-            programs = &mut CACHED_PROGRAMS;
-        }
+            &mut CACHED_PROGRAMS
+        };
 
         if !programs.contains_key(&d) {
             programs.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
