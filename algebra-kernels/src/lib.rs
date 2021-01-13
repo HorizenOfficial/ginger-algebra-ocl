@@ -17,25 +17,24 @@ trait SingleKernel<'a> {
 
     fn get_program(d: &opencl::Device, hash_key: TypeId) -> GPUResult<&'a opencl::Program> {
 
-        let program;
+        let programs;
 
         unsafe {
             CACHED_PROGRAMS.init();
-            let programs = &mut CACHED_PROGRAMS;
-
-            if !programs.contains_key(&d) {
-                programs.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
-            }
-            if !programs.get(&d).unwrap().contains_key(&hash_key) {
-                programs.get_mut(&d).unwrap().insert(
-                    hash_key.clone(), 
-                    opencl::Program::from_opencl(d.clone(), &Self::get_program_src())?
-                );
-            }
-            program = programs.get(&d).unwrap().get(&hash_key).unwrap().clone();        
+            programs = &mut CACHED_PROGRAMS;
         }
 
-        Ok(program)
+        if !programs.contains_key(&d) {
+            programs.insert(d.clone(), HashMap::<TypeId, opencl::Program>::new());
+        }
+        if !programs.get(&d).unwrap().contains_key(&hash_key) {
+            programs.get_mut(&d).unwrap().insert(
+                hash_key.clone(), 
+                opencl::Program::from_opencl(d.clone(), &Self::get_program_src())?
+            );
+        }
+
+        Ok(programs.get(&d).unwrap().get(&hash_key).unwrap().clone())
     }
 
     fn get_program_src() -> String;
