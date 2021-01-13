@@ -12,6 +12,8 @@ lazy_static::lazy_static! {
             ("gfx906".to_string(), 7400),
 
             // NVIDIA
+            ("Quadro RTX 5000".to_string(), 3072),
+            ("Quadro RTX 5000 with Max-Q Design".to_string(), 3072),
             ("Quadro RTX 6000".to_string(), 4608),
 
             ("TITAN RTX".to_string(), 4608),
