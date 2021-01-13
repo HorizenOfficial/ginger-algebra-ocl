@@ -97,6 +97,7 @@ where
 
     pub core_count: usize,
     pub n: usize,
+    pub window_size: Option<usize>,
     pub prefix_map: HashMap<TypeId, String>,
 
     _phantom: std::marker::PhantomData<<G::ScalarField as PrimeField>::BigInt>,
@@ -125,14 +126,24 @@ where
         let max_n = calc_chunk_size::<G>(mem, core_count);
         let best_n = calc_best_chunk_size(MAX_WINDOW_SIZE, core_count, scalar_bits);
         let n = std::cmp::min(max_n, best_n);
+        let window_size = None;
 
         Ok(MSMSingleKernel {
             program,
             core_count,
             n,
+            window_size,
             prefix_map,
             _phantom: std::marker::PhantomData,
         })
+    }
+
+    pub fn set_window_size(&mut self, size: usize) {
+        self.window_size = Some(size);
+    }
+
+    pub fn unset_window_size(&mut self) {
+        self.window_size = None;
     }
 
     pub fn msm_c(
@@ -223,7 +234,10 @@ where
     ) -> GPUResult<G::Projective>
     {
         let scalar_bits = std::mem::size_of::<<G::ScalarField as PrimeField>::BigInt>() * 8;
-        let window_size = calc_window_size(n as usize, scalar_bits, self.core_count);
+        let window_size = match self.window_size {
+            Some(size) => size,
+            None => calc_window_size(n as usize, scalar_bits, self.core_count)
+        };
         let num_windows = ((scalar_bits as f64) / (window_size as f64)).ceil() as usize;
         let num_groups = calc_num_groups(self.core_count, num_windows);
         let bucket_len = 1 << window_size;
