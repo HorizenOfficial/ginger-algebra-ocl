@@ -1,4 +1,7 @@
-use algebra::{PrimeField, AffineCurve, Fp2Parameters};
+use algebra::{
+    PrimeField, AffineCurve, Fp2Parameters, 
+    curves::*
+};
 use itertools::*;
 use ff_cl_gen as ffgen;
 use ffgen::*;
@@ -70,45 +73,45 @@ where
     let mut prefix_map = HashMap::<TypeId, String>::new();
 
     #[cfg(feature = "bn_382")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::g::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn_382::g::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G2Affine>()
     {
-        prefix_map.insert(TypeId::of::<algebra::curves::bn_382::g::Affine>(), String::from("G_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::bn_382::G1Affine>(), String::from("G1_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::bn_382::G2Affine>(), String::from("G2_"));
+        prefix_map.insert(TypeId::of::<bn_382::g::Affine>(), String::from("G_"));
+        prefix_map.insert(TypeId::of::<bn_382::G1Affine>(), String::from("G1_"));
+        prefix_map.insert(TypeId::of::<bn_382::G2Affine>(), String::from("G2_"));
     }
 
     #[cfg(feature = "bls12_381")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_381::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_381::G2Affine>()
     {
-        prefix_map.insert(TypeId::of::<algebra::curves::bls12_381::G1Affine>(), String::from("G1_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::bls12_381::G2Affine>(), String::from("G2_"));
+        prefix_map.insert(TypeId::of::<bls12_381::G1Affine>(), String::from("G1_"));
+        prefix_map.insert(TypeId::of::<bls12_381::G2Affine>(), String::from("G2_"));
     }
     
     #[cfg(feature = "bls12_377")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_377::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_377::G2Affine>()
     {    
-        prefix_map.insert(TypeId::of::<algebra::curves::bls12_377::G1Affine>(), String::from("G1_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::bls12_377::G2Affine>(), String::from("G2_"));
+        prefix_map.insert(TypeId::of::<bls12_377::G1Affine>(), String::from("G1_"));
+        prefix_map.insert(TypeId::of::<bls12_377::G2Affine>(), String::from("G2_"));
     }
     
     #[cfg(feature = "bn254")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn254::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn254::G2Affine>()
     {
-        prefix_map.insert(TypeId::of::<algebra::curves::bn254::G1Affine>(), String::from("G1_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::bn254::G2Affine>(), String::from("G2_"));
+        prefix_map.insert(TypeId::of::<bn254::G1Affine>(), String::from("G1_"));
+        prefix_map.insert(TypeId::of::<bn254::G2Affine>(), String::from("G2_"));
     }
     
     #[cfg(feature = "tweedle")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dee::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dum::Affine>()
+    if TypeId::of::<G>() == TypeId::of::<tweedle::dee::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<tweedle::dum::Affine>()
     {
-        prefix_map.insert(TypeId::of::<algebra::curves::tweedle::dee::Affine>(), String::from("Dee_"));
-        prefix_map.insert(TypeId::of::<algebra::curves::tweedle::dum::Affine>(), String::from("Dum_"));
+        prefix_map.insert(TypeId::of::<tweedle::dee::Affine>(), String::from("Dee_"));
+        prefix_map.insert(TypeId::of::<tweedle::dum::Affine>(), String::from("Dum_"));
     }
 
     prefix_map
@@ -134,9 +137,9 @@ where
     let mut src = String::from("");
 
     #[cfg(feature = "bn_382")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::g::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn_382::g::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G2Affine>()
     {
         src = multiexp_src!(
             limb64, bn_382, true,
@@ -147,8 +150,8 @@ where
     }
 
     #[cfg(feature = "bls12_381")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_381::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_381::G2Affine>()
     {
         src = multiexp_src!(
             limb64, bls12_381, true,
@@ -158,8 +161,8 @@ where
     }
     
     #[cfg(feature = "bls12_377")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_377::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_377::G2Affine>()
     {
         src = multiexp_src!(
             limb64, bls12_377, true,
@@ -169,8 +172,8 @@ where
     }
     
     #[cfg(feature = "bn254")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn254::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn254::G2Affine>()
     {
         src = multiexp_src!(
             limb64, bn254, true,
@@ -180,8 +183,8 @@ where
     }
 
     #[cfg(feature = "tweedle")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dee::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dum::Affine>()
+    if TypeId::of::<G>() == TypeId::of::<tweedle::dee::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<tweedle::dum::Affine>()
     {
         src = multiexp_src!(
             limb64, tweedle, false,
@@ -191,6 +194,7 @@ where
     }
 
     src
+
 }
 
 pub fn kernel_polycommit<G>(limb64: bool) -> String
@@ -200,9 +204,9 @@ where
     let mut src = String::from("");
 
     #[cfg(feature = "bn_382")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::g::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn_382::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn_382::g::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn_382::G2Affine>()
     {
         src = polycommit_round_reduce_src!(
             limb64, bn_382, true,
@@ -213,8 +217,8 @@ where
     }
 
     #[cfg(feature = "bls12_381")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_381::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_381::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_381::G2Affine>()
     {
         src = polycommit_round_reduce_src!(
             limb64, bls12_381, true,
@@ -224,8 +228,8 @@ where
     }
     
     #[cfg(feature = "bls12_377")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bls12_377::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bls12_377::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bls12_377::G2Affine>()
     {
         src = polycommit_round_reduce_src!(
             limb64, bls12_377, true,
@@ -235,8 +239,8 @@ where
     }
     
     #[cfg(feature = "bn254")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G1Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::bn254::G2Affine>()
+    if TypeId::of::<G>() == TypeId::of::<bn254::G1Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<bn254::G2Affine>()
     {
         src = polycommit_round_reduce_src!(
             limb64, bn254, true,
@@ -246,8 +250,8 @@ where
     }
 
     #[cfg(feature = "tweedle")]
-    if TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dee::Affine>() ||
-       TypeId::of::<G>() == TypeId::of::<algebra::curves::tweedle::dum::Affine>()
+    if TypeId::of::<G>() == TypeId::of::<tweedle::dee::Affine>() ||
+       TypeId::of::<G>() == TypeId::of::<tweedle::dum::Affine>()
     {
         src = polycommit_round_reduce_src!(
             limb64, tweedle, false,
