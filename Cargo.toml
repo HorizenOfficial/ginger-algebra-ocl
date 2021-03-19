@@ -1,0 +1,35 @@
+[workspace]
+
+members = [
+    "algebra-cl-gen",
+    "algebra-kernels",
+    "ff-cl-gen"
+]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+incremental = true
+
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = "thin"
+incremental = true
+debug-assertions = false
+
+[profile.dev]
+opt-level = 3
+
+[profile.test]
+opt-level = 3
+lto = "thin"
+incremental = true
+debug-assertions = true
+debug = true
+
+# Uncomment these lines for local development paths
+
+# [patch.'https://github.com/HorizenOfficial/ginger-lib']
+# algebra = { path = '../ginger-lib/algebra' }

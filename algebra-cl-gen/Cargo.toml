@@ -1,0 +1,37 @@
+[package]
+name = "algebra-cl-gen"
+authors = [
+  "dignifiedquire <me@dignifiedquire.com>",
+  "Sean Bowe <ewillbefull@gmail.com>",
+]
+description = "zk-SNARK library"
+license = "MIT/Apache-2.0"
+version = "0.12.3"
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+algebra = { git = "https://github.com/HorizenOfficial/ginger-lib", branch = "algebra_ocl" }
+log = "0.4.8"
+lazy_static = "1.4.0"
+thiserror = "1.0.10"
+itertools = { version = "0.8.0" }
+rust-gpu-tools = { version = "0.3.0" }
+ff-cl-gen = { path = "../ff-cl-gen" }
+
+[dev-dependencies]
+rand_xorshift = "0.2"
+env_logger = "0.8.1"
+criterion = "0.3.2"
+
+[features]
+bls12_377 = [ "algebra/bls12_377" ]
+bls12_381 = [ "algebra/bls12_381" ]
+edwards_bls12 = [ "algebra/edwards_bls12" ]
+edwards_sw6 = [ "algebra/edwards_sw6" ]
+jubjub = [ "algebra/jubjub" ]
+sw6 = [ "algebra/sw6" ]
+mnt4_753 = [ "algebra/mnt4_753" ]
+mnt6_753 = [ "algebra/mnt6_753" ]
+bn_382 = [ "algebra/bn_382" ]
+tweedle = [ "algebra/tweedle" ]

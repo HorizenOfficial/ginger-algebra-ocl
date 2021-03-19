@@ -1,6 +1,8 @@
-# ff-cl-gen [![Crates.io](https://img.shields.io/crates/v/ff-cl-gen.svg)](https://crates.io/crates/ff-cl-gen)
+# ff-cl-gen
 
-OpenCL code generator for finite-field arithmetic over prime fields constructed with Rust [ff](https://github.com/filecoin-project/ff) library.
+> This is a fork of the filecoin [bellperson](https://github.com/filecoin-project/ff-cl-gen) library.
+
+OpenCL code generator for finite-field arithmetic over prime fields constructed with Rust [ginger-lib](https://github.com/HorizenOfficial/ginger-lib) library.
 
 Notes:
  - Limbs are 32/64-bit long, by your choice.
@@ -8,11 +10,10 @@ Notes:
 
 ## Usage
 
-Generating OpenCL codes for Bls12-381 Fr elements:
+Generating OpenCL codes for BN-382 Fr elements:
 
 ```rust
-use paired::bls12_381::Fr;
-let src = ff_cl_gen::field::<Fr, Limb64>("Fr");
+let src = ff_cl_gen::field::<algebra::fields::bn_382::Fr, Limb64>("Fr")
 ```
 
 Generated interface (`FIELD` is substituted with `Fr`):
@@ -41,21 +42,3 @@ FIELD FIELD_mont(FIELD a); // To montgomery form
 FIELD FIELD_unmont(FIELD a); // To regular form
 bool FIELD_get_bit(FIELD l, uint i); // Get `i`th bit (From most significant digit)
 uint FIELD_get_bits(FIELD l, uint skip, uint window); // Get `window` consecutive bits, (Starting from `skip`th bit from most significant digit)
-```
-
-## License
-
-Licensed under either of
-
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-   http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-### Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the Apache-2.0
-license, shall be dual licensed as above, without any additional terms or
-conditions.
